@@ -93,4 +93,4 @@ Nota: Al ejecutar terraform ocurrirá un error ya que la BD y el cluster ya exis
 
 1. El proyecto se encuentra en el repositorio de GiHub: https://github.com/RvdyOn3/Nequi
 2. La contenedor listo para su uso se encuentra en Docker Hub: https://hub.docker.com/r/rvasquezi/nequi
-3. El proyecto se encuentra desplegado y listo para usar en Render: https://nequi-jrby.onrender.com
+3. El proyecto se encuentra desplegado y listo para usar en Render: https://nequi-jrby.onrender.com](https://nequi-jrby.onrender.com/webjars/swagger-ui/index.html
