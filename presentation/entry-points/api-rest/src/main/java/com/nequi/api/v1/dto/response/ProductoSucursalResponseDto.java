@@ -5,7 +5,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class FranquiciaResponseDto {
+public class ProductoSucursalResponseDto {
     private String code;
     private String name;
+    private Integer stock;
+    private String sucursalCode;
+    private String nameSucursal;
 }
