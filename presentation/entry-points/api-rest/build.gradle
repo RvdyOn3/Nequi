@@ -17,3 +17,7 @@ dependencies {
 bootRun {
     mainClass = 'com.nequi.api.Application'
 }
+
+tasks.named('bootJar') {
+    archiveFileName = 'app.jar'
+}
