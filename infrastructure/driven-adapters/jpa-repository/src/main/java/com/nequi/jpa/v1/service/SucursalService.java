@@ -3,7 +3,10 @@ package com.nequi.jpa.v1.service;
 import com.nequi.jpa.v1.mapper.ISucursalMapper;
 import com.nequi.jpa.v1.repository.SucursalMongoRepository;
 import com.nequi.v1.gateway.ISucursalGateway;
+import com.nequi.v1.model.Producto;
 import com.nequi.v1.model.Sucursal;
+import com.nequi.v1.model.error.CustomException;
+import com.nequi.v1.model.util.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -15,7 +18,20 @@ public class SucursalService implements ISucursalGateway {
     private final ISucursalMapper iSucursalMapper;
 
     public Mono<Sucursal> addSucursal(Sucursal sucursal) {
-        return sucursalMongoRepository.save(iSucursalMapper.toDocument(sucursal)).map(iSucursalMapper::toModel);
+        return sucursalMongoRepository.findByName(sucursal.getName().toUpperCase())
+                .flatMap(existingSucursal ->
+                        Mono.<Sucursal>error(new CustomException(ResponseCode.NEQUI001, "La sucursal ya se encuentra registrada."))
+                )
+                .switchIfEmpty(Mono.defer(() ->
+                        sucursalMongoRepository.save(iSucursalMapper.toDocument(sucursal))
+                                .map(iSucursalMapper::toModel)
+                ))
+                .onErrorResume(throwable -> {
+                    if (throwable instanceof CustomException) {
+                        return Mono.<Sucursal>error((CustomException) throwable);
+                    }
+                    return Mono.<Sucursal>error(new CustomException(ResponseCode.NEQUI003, "Error inesperado al procesar la sucursal."));
+                });
     }
 
 }
