@@ -7,6 +7,7 @@ pluginManagement {
 }
 
 rootProject.name = 'Nequi'
+include 'app'
 
 include ':api-rest'
 include ':usecase'
