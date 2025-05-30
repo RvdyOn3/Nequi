@@ -3,6 +3,8 @@ WORKDIR /app
 
 COPY . .
 
+RUN chmod +x ./gradlew
+
 RUN ./gradlew :api-rest:bootJar
 
 FROM openjdk:17-alpine
