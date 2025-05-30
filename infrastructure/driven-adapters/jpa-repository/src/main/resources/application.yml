@@ -1,0 +1,5 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://developer:Nequi2025.@nequi.gya2kfx.mongodb.net/?retryWrites=true&w=majority&appName=nequi
+      database: nequi
