@@ -1,0 +1,12 @@
+plugins {
+    id 'java'
+}
+
+dependencies {
+    implementation project(':domain')
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive:2.5.4'
+
+    compileOnly 'org.mapstruct:mapstruct:1.5.1.Final'
+    testImplementation 'org.mapstruct:mapstruct:1.5.1.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.1.Final'
+}

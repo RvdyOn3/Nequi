@@ -1,0 +1,18 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        google()
+    }
+}
+
+rootProject.name = 'Nequi'
+
+include ':api-rest'
+include ':usecase'
+include ':domain'
+include ':jpa-repository'
+project(':api-rest').projectDir = file('./presentation/entry-points/api-rest')
+project(':usecase').projectDir = file('./application/usecase')
+project(':domain').projectDir = file('./domain')
+project(':jpa-repository').projectDir = file('./infrastructure/driven-adapters/jpa-repository')
