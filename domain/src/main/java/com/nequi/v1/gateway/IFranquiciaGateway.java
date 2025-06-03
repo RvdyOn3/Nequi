@@ -5,4 +5,6 @@ import reactor.core.publisher.Mono;
 
 public interface IFranquiciaGateway {
     Mono<Franquicia> addFranquicia(Franquicia franquicia);
+    Mono<Franquicia> getFranquiciaById(String id);
+    Mono<Void> updateFranquiciaName(String id, String name);
 }

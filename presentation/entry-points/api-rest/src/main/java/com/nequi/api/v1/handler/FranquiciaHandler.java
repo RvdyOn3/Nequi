@@ -4,6 +4,7 @@ import com.nequi.api.v1.dto.GenericResponseDto;
 import com.nequi.api.v1.dto.request.FranquiciaRequestDto;
 import com.nequi.api.v1.dto.response.FranquiciaResponseDto;
 import com.nequi.usecase.v1.CreateFranquiciaUseCase;
+import com.nequi.usecase.v1.UpdateNameFranquiciaUseCase;
 import com.nequi.v1.model.Franquicia;
 import com.nequi.v1.model.error.CustomException;
 import com.nequi.v1.model.util.ResponseCode;
@@ -18,6 +19,7 @@ import java.text.MessageFormat;
 public class FranquiciaHandler {
 
     private final CreateFranquiciaUseCase createFranquiciaUseCase;
+    private final UpdateNameFranquiciaUseCase updateNameFranquiciaUseCase;
 
     public Mono<GenericResponseDto<FranquiciaResponseDto>> addFranquicia(FranquiciaRequestDto franquiciaRequestDto) {
         return createFranquiciaUseCase.execute(buildFranquicia(franquiciaRequestDto))
@@ -40,6 +42,10 @@ public class FranquiciaHandler {
                                 null
                         ))
                 );
+    }
+
+    public Mono<Void> updateName(String code, String name) {
+        return updateNameFranquiciaUseCase.execute(code, name);
     }
 
     private Franquicia buildFranquicia(FranquiciaRequestDto franquiciaRequestDto) {

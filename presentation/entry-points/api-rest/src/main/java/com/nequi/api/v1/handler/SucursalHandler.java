@@ -19,27 +19,38 @@ public class SucursalHandler {
     private final CreateSucursalUseCase createSucursalUseCase;
 
     public Mono<GenericResponseDto<SucursalResponseDto>> addSucursal(SucursalRequestDto sucursalRequestDto) {
-        return createSucursalUseCase.execute(buildSucursal(sucursalRequestDto))
+        return createSucursal(sucursalRequestDto)
                 .map(this::buildSucursalResponse)
                 .onErrorResume(CustomException.class, customException ->
-                        Mono.just(new GenericResponseDto<>(
-                                customException.getResponseCode().getStatus(),
-                                customException.getResponseCode().toString(),
-                                MessageFormat.format(customException.getResponseCode().getHtmlMessage(), sucursalRequestDto.getName()),
-                                customException.getFieldErrors(),
-                                null
-                        ))
+                        Mono.just(buildErrorResponse(customException, sucursalRequestDto.getName()))
                 )
                 .onErrorResume(sucursalResponseDto ->
-                        Mono.just(new GenericResponseDto<>(
-                                ResponseCode.NEQUI003.getStatus(),
-                                ResponseCode.NEQUI003.getHtmlMessage(),
-                                "Error inesperado al procesar el producto.",
-                                null,
-                                null
-                        ))
+                        Mono.just(buildUnexpectedErrorResponse())
                 );
+    }
 
+    private Mono<Sucursal> createSucursal(SucursalRequestDto sucursalRequestDto){
+        return createSucursalUseCase.execute(buildSucursal(sucursalRequestDto));
+    }
+
+    private GenericResponseDto<SucursalResponseDto> buildErrorResponse(CustomException ex, String sucursalName) {
+        return new GenericResponseDto<>(
+                ex.getResponseCode().getStatus(),
+                ex.getResponseCode().toString(),
+                MessageFormat.format(ex.getResponseCode().getHtmlMessage(), sucursalName),
+                ex.getFieldErrors(),
+                null
+        );
+    }
+
+    private GenericResponseDto<SucursalResponseDto> buildUnexpectedErrorResponse() {
+        return new GenericResponseDto<>(
+                ResponseCode.NEQUI003.getStatus(),
+                ResponseCode.NEQUI003.toString(),
+                "Error inesperado al procesar la sucursal.",
+                null,
+                null
+        );
     }
 
     private Sucursal buildSucursal(SucursalRequestDto sucursalRequestDto) {

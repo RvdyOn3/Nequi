@@ -8,6 +8,7 @@ import com.nequi.v1.model.Franquicia;
 import com.nequi.v1.model.error.CustomException;
 import com.nequi.v1.model.util.ResponseCode;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -32,5 +33,21 @@ public class FranquiciaService implements IFranquiciaGateway {
                     }
                     return Mono.<Franquicia>error(new CustomException(ResponseCode.NEQUI003, "Error inesperado al procesar la franquicia."));
                 });
+    }
+
+    public Mono<Franquicia> getFranquiciaById(String id) {
+        return franquiciaMongoRepository.findById(id)
+                .map(iFranquiciaMapper::toModel)
+                .switchIfEmpty(Mono.error(new CustomException(ResponseCode.NEQUI006, "Franquicia no encontrada.")));
+    }
+
+    public Mono<Void> updateFranquiciaName(String id, String name) {
+        return franquiciaMongoRepository.findById(id)
+                .switchIfEmpty(Mono.error(new CustomException(ResponseCode.NEQUI006, "Franquicia no encontrada.")))
+                .flatMap(existingFranquicia -> {
+                    existingFranquicia.setName(name.toUpperCase());
+                    return franquiciaMongoRepository.save(existingFranquicia);
+                })
+                .then();
     }
 }
