@@ -5,4 +5,5 @@ import reactor.core.publisher.Mono;
 
 public interface ISucursalGateway {
     Mono<Sucursal> addSucursal(Sucursal sucursal);
+    Mono<Sucursal> getSucursalById(String id);
 }
