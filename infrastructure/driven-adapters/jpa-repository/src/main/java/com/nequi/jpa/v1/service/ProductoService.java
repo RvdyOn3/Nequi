@@ -47,7 +47,9 @@ public class ProductoService implements IProductoGateway {
     }
 
     public Mono<Void> deleteProducto(String id) {
-        return productoMongoRepository.deleteById(id);
+        return productoMongoRepository.findById(id)
+                .switchIfEmpty(Mono.error(new Exception("Producto no encontrado")))
+                .flatMap(producto -> productoMongoRepository.deleteById(id));
     }
 
     public Mono<Void> updateStock(String id, Integer stock) {

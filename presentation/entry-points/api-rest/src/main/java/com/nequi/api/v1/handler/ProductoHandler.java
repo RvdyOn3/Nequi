@@ -2,7 +2,6 @@ package com.nequi.api.v1.handler;
 
 import com.nequi.api.v1.dto.GenericResponseDto;
 import com.nequi.api.v1.dto.request.ProductoRequestDto;
-import com.nequi.api.v1.dto.request.UpdateStockRequestDto;
 import com.nequi.api.v1.dto.response.ProductoResponseDto;
 import com.nequi.api.v1.dto.response.ProductoSucursalResponseDto;
 import com.nequi.usecase.v1.CreateProductoUseCase;
@@ -29,25 +28,13 @@ public class ProductoHandler {
     private final GetProductBySucursalUseCase getProductBySucursalUseCase;
 
     public Mono<GenericResponseDto<ProductoResponseDto>> addProducto(ProductoRequestDto productoRequestDto) {
-        return createProductoUseCase.execute(buildProducto(productoRequestDto))
+        return createProducto(productoRequestDto)
                 .map(this::buildProductoResponse)
                 .onErrorResume(CustomException.class, customException ->
-                        Mono.just(new GenericResponseDto<>(
-                                customException.getResponseCode().getStatus(),
-                                customException.getResponseCode().toString(),
-                                MessageFormat.format(customException.getResponseCode().getHtmlMessage(), productoRequestDto.getName()),
-                                customException.getFieldErrors(),
-                                null
-                        ))
+                        Mono.just(buildErrorResponse(customException, productoRequestDto.getName()))
                 )
                 .onErrorResume(throwable ->
-                        Mono.just(new GenericResponseDto<>(
-                                ResponseCode.NEQUI003.getStatus(),
-                                ResponseCode.NEQUI003.getHtmlMessage(),
-                                "Error inesperado al procesar el producto.",
-                                null,
-                                null
-                        ))
+                        Mono.just(buildUnexpectedErrorResponse())
                 );
     }
 
@@ -60,7 +47,6 @@ public class ProductoHandler {
     }
 
     public Flux<GenericResponseDto<ProductoSucursalResponseDto>> getProductosConMayorStockPorSucursal(String franquiciaId) {
-
         return getProductBySucursalUseCase.execute(franquiciaId)
                 .map(this::buildProductoBySucursalResponse)
                 .onErrorResume(CustomException.class, customException ->
@@ -81,6 +67,10 @@ public class ProductoHandler {
                                 null
                         ))
                 );
+    }
+
+    private Mono<Producto> createProducto(ProductoRequestDto productoRequestDto) {
+        return createProductoUseCase.execute(buildProducto(productoRequestDto));
     }
 
     private Producto buildProducto(ProductoRequestDto productoRequestDto) {
@@ -107,9 +97,29 @@ public class ProductoHandler {
         productoResponseDto.setName(producto.getName());
         productoResponseDto.setStock(producto.getStock());
         productoResponseDto.setSucursalCode(producto.getSucursalId());
-        productoResponseDto.setNameSucursal(productoResponseDto.getNameSucursal());
+        productoResponseDto.setNameSucursal(producto.getNameSucursal());
 
-        return new GenericResponseDto<>(ResponseCode.NEQUI002.getStatus(),ResponseCode.NEQUI002.getHtmlMessage(),
+        return new GenericResponseDto<>(ResponseCode.NEQUI008.getStatus(),ResponseCode.NEQUI008.getHtmlMessage(),
                 "", productoResponseDto);
+    }
+
+    private GenericResponseDto<ProductoResponseDto> buildErrorResponse(CustomException ex, String productName) {
+        return new GenericResponseDto<>(
+                ex.getResponseCode().getStatus(),
+                ex.getResponseCode().toString(),
+                MessageFormat.format(ex.getResponseCode().getHtmlMessage(), productName),
+                ex.getFieldErrors(),
+                null
+        );
+    }
+
+    private GenericResponseDto<ProductoResponseDto> buildUnexpectedErrorResponse() {
+        return new GenericResponseDto<>(
+                ResponseCode.NEQUI003.getStatus(),
+                ResponseCode.NEQUI003.getHtmlMessage(),
+                "Error inesperado al procesar el producto.",
+                null,
+                null
+        );
     }
 }

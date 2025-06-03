@@ -2,6 +2,7 @@ package com.nequi.jpa.v1.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,5 +14,5 @@ public class ProductDocument {
     private String id;
     private String name;
     private Integer stock;
-    private String sucursalId;
+    private ObjectId sucursalId;
 }

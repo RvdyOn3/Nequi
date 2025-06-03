@@ -18,7 +18,7 @@ public class SucursalService implements ISucursalGateway {
     private final ISucursalMapper iSucursalMapper;
 
     public Mono<Sucursal> addSucursal(Sucursal sucursal) {
-        return sucursalMongoRepository.findByName(sucursal.getName().toUpperCase())
+        return getSucursalByName(sucursal.getName())
                 .flatMap(existingSucursal ->
                         Mono.<Sucursal>error(new CustomException(ResponseCode.NEQUI001, "La sucursal ya se encuentra registrada."))
                 )
@@ -34,4 +34,15 @@ public class SucursalService implements ISucursalGateway {
                 });
     }
 
+    public Mono<Sucursal> getSucursalByName(String name){
+        return sucursalMongoRepository.findByName(name.toUpperCase())
+                .map(iSucursalMapper::toModel)
+                .switchIfEmpty(Mono.error(new CustomException(ResponseCode.NEQUI006, "Sucursal no encontrada.")));
+    }
+
+    public Mono<Sucursal> getSucursalById(String id) {
+        return sucursalMongoRepository.findById(id)
+                .map(iSucursalMapper::toModel)
+                .switchIfEmpty(Mono.error(new CustomException(ResponseCode.NEQUI007, "Sucursal no encontrada.")));
+    }
 }
